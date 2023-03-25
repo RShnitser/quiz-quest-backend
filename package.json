@@ -4,7 +4,8 @@
   "description": "backend-database",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npx nodemon",
+    "seed": "ts-node prisma/seed.ts"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +15,8 @@
     "prisma": "^4.11.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^18.15.8",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
   }
