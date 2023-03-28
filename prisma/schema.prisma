@@ -11,18 +11,21 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
+  id       Int        @id @default(autoincrement())
+  email    String     @unique
   password String
-  //History  History[]
+  History  History[]
+  Question Question[]
 }
 
 model Question {
-  id       Int      @id @default(autoincrement())
+  id       Int       @id @default(autoincrement())
   question String
   type     String
   options  Answer[]
-  //history  History[]
+  user     User      @relation(fields: [userId], references: [id])
+  userId   Int
+  history  History[]
   tag      Tag[]
 }
 
@@ -34,23 +37,31 @@ model Tag {
 }
 
 model Answer {
-  id            Int      @id @default(autoincrement())
-  question      Question @relation(fields: [questionId], references: [id])
+  id            Int          @id @default(autoincrement())
+  question      Question     @relation(fields: [questionId], references: [id])
   questionId    Int
   answer        String
   answerApplies Boolean?
-  //History       History[]
+  userAnswer    UserAnswer[]
 }
 
-// model History {
-//   id                Int      @id @default(autoincrement())
-//   user              User     @relation(fields: [userId], references: [id])
-//   userId            Int
-//   question          Question @relation(fields: [questionId], references: [id])
-//   questionId        Int
-//   answer            Answer   @relation(fields: [answerId], references: [id])
-//   answerId          Int
-//   userAnswer        String?
-//   userAnswerApplies Boolean?
-//   createdDate       DateTime @default(now())
-// }
+model History {
+  id          Int          @id @default(autoincrement())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      Int
+  question    Question     @relation(fields: [questionId], references: [id])
+  questionId  Int
+  userAnswer  UserAnswer[]
+  createdDate DateTime     @default(now())
+}
+
+model UserAnswer {
+  id                Int      @id @default(autoincrement())
+  history           History  @relation(fields: [historyId], references: [id])
+  historyId         Int
+  answer            Answer   @relation(fields: [answerId], references: [id])
+  answerId          Int
+  userAnswer        String?
+  userAnswerApplies Boolean?
+  order             Int?
+}
