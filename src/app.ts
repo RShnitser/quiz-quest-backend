@@ -1,16 +1,13 @@
 import express from "express";
-import { prisma } from "./client";
+import cors from "cors";
+import { questionRouter } from "./routers/questions";
+import { authRouter } from "./routers/auth";
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("<div>App</div>");
-});
-
-app.get("/users", async (req, res) => {
-  const users = await prisma.user.findMany();
-  res.send(users);
-});
+app.use("/auth", authRouter);
+app.use("/questions", questionRouter);
 
 app.listen(3000);
