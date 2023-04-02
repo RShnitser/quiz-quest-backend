@@ -13,7 +13,7 @@ export const createToken = (user: User) => {
     email: user.email,
   };
 
-  return jwt.sign(userInfo, "secret");
+  return jwt.sign(userInfo, process.env.JWT_KEY);
 };
 
 const jwtInfoSchema = z.object({
@@ -27,7 +27,7 @@ export const getDataFromToken = (token?: string) => {
   }
 
   try {
-    return jwtInfoSchema.parse(jwt.verify(token, "secret"));
+    return jwtInfoSchema.parse(jwt.verify(token, process.env.JWT_KEY));
   } catch (e) {
     console.error(e);
     return null;
