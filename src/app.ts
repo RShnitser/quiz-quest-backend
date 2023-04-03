@@ -2,8 +2,14 @@ import express from "express";
 import cors from "cors";
 import { questionRouter } from "./routers/questions";
 import { authRouter } from "./routers/auth";
+import { User } from "@prisma/client";
 
 declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
   namespace NodeJS {
     export interface ProcessEnv {
       DATABASE_URL: string;
@@ -17,6 +23,7 @@ for (const key of ["DATABASE_URL", "JWT_KEY"]) {
     throw new Error(`Missing environment key variable ${key}`);
   }
 }
+
 const app = express();
 
 app.use(cors());
