@@ -1,4 +1,5 @@
 import { prisma } from "../src/client";
+import { encryptPassword } from "../src/utils";
 
 const clearDB = async () => {
   await prisma.userAnswer.deleteMany();
@@ -20,6 +21,24 @@ const users = [
   },
 ];
 
+const tags = [
+  {
+    value: "HTML",
+  },
+  {
+    value: "CSS",
+  },
+  {
+    value: "Javascript",
+  },
+  {
+    value: "Git",
+  },
+  {
+    value: "React",
+  },
+];
+
 type Answer = {
   answer: string;
   answerApplies?: boolean;
@@ -29,7 +48,8 @@ type Question = {
   question: string;
   type: string;
   answers: Answer[];
-  tags: string[];
+  tags: number[];
+  userId: number;
 };
 
 type UserAnswer = {
@@ -46,19 +66,21 @@ type History = {
   answer: UserAnswer[];
 };
 
-const user1Q: Question[] = [
+const questions: Question[] = [
   {
     question: "HTML is an acronym for Hypertext _________ Language.",
     type: "Fill in the blank",
     answers: [{ answer: "Markup" }],
-    tags: ["HTML"],
+    tags: [1],
+    userId: 1,
   },
   {
     question:
       "Git allows you to work on a new feature without breaking existing code by creating a new __________.",
     type: "Fill in the blank",
     answers: [{ answer: "branch" }],
-    tags: ["Git"],
+    tags: [4],
+    userId: 1,
   },
   {
     question: "These are block level elements.",
@@ -81,7 +103,8 @@ const user1Q: Question[] = [
         answerApplies: true,
       },
     ],
-    tags: ["HTML"],
+    tags: [1],
+    userId: 1,
   },
   {
     question: "These methods will always iterate through the entire array.",
@@ -104,11 +127,9 @@ const user1Q: Question[] = [
         answerApplies: false,
       },
     ],
-    tags: ["Javascript"],
+    tags: [3],
+    userId: 1,
   },
-];
-
-const user2Q: Question[] = [
   {
     question:
       "Which hook can be used to run code once when the component is created?",
@@ -131,7 +152,8 @@ const user2Q: Question[] = [
         answerApplies: false,
       },
     ],
-    tags: ["React"],
+    tags: [5],
+    userId: 2,
   },
   {
     question: "Arrays start at index",
@@ -154,7 +176,8 @@ const user2Q: Question[] = [
         answerApplies: false,
       },
     ],
-    tags: ["Javascript"],
+    tags: [3],
+    userId: 2,
   },
   {
     question: "The command git checkout -b feature-nav will",
@@ -177,7 +200,8 @@ const user2Q: Question[] = [
         answerApplies: false,
       },
     ],
-    tags: ["Git"],
+    tags: [4],
+    userId: 2,
   },
   {
     question: "These are valid units of length in CSS",
@@ -200,7 +224,8 @@ const user2Q: Question[] = [
         answerApplies: true,
       },
     ],
-    tags: ["CSS"],
+    tags: [2],
+    userId: 2,
   },
 ];
 
@@ -435,7 +460,7 @@ const seedUsers = async () => {
     const newUser = await prisma.user.create({
       data: {
         email: user.email,
-        password: user.password,
+        password: await encryptPassword(user.password),
       },
     });
     result.push(newUser.id);
@@ -443,46 +468,57 @@ const seedUsers = async () => {
   return result;
 };
 
-const seedDb = async () => {
-  const userIds = await seedUsers();
-  const questionIds1 = await seedQuestions(user1Q, userIds[0]);
-  const questionIds2 = await seedQuestions(user2Q, userIds[1]);
-  const answers1 = await seedAnswers(user1Q, questionIds1);
-  const answers2 = await seedAnswers(user2Q, questionIds2);
+const seedTags = async () => {
+  const result = [];
+  for (const tag of tags) {
+    const newTag = await prisma.tag.create({
+      data: {
+        value: tag.value,
+      },
+    });
+    result.push(newTag.id);
+  }
 
-  const questionIds = questionIds1.concat(questionIds2);
-  const answerIds = answers1.concat(answers2);
+  return result;
+};
+
+const seedDb = async () => {
+  await clearDB();
+
+  const userIds = await seedUsers();
+  const tagIds = await seedTags();
+  const questionIds = await seedQuestions(questions, userIds, tagIds);
+  //const questionIds2 = await seedQuestions(user2Q, userIds[1]);
+  const answerIds = await seedAnswers(questions, questionIds);
+  //const answers2 = await seedAnswers(user2Q, questionIds2);
+
+  //const questionIds = questionIds1.concat(questionIds2);
+  //const answerIds = answers1.concat(answers2);
 
   await seedHistory(userIds, questionIds, answerIds);
 };
 
-const seedQuestions = async (array: Question[], id: number) => {
+const seedQuestions = async (
+  array: Question[],
+  userIds: number[],
+  tagIds: number[]
+) => {
   const result = [];
   for (const question of array) {
     const newQuestion = await prisma.question.create({
       data: {
         question: question.question,
         type: question.type,
-        userId: id,
+        userId: userIds[question.userId - 1],
       },
     });
     result.push(newQuestion.id);
 
-    for (const answer of question.answers) {
-      const newAnswer = await prisma.answer.create({
-        data: {
-          questionId: newQuestion.id,
-          answer: answer.answer,
-          answerApplies: answer.answerApplies,
-        },
-      });
-    }
-
     for (const tag of question.tags) {
-      await prisma.tag.create({
+      await prisma.questionTag.create({
         data: {
           questionId: newQuestion.id,
-          value: tag,
+          tagId: tagIds[tag - 1],
         },
       });
     }

@@ -17,9 +17,16 @@ CREATE TABLE "Question" (
 -- CreateTable
 CREATE TABLE "Tag" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "value" TEXT NOT NULL,
+    "value" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "QuestionTag" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "tagId" INTEGER NOT NULL,
     "questionId" INTEGER NOT NULL,
-    CONSTRAINT "Tag_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "Question" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "QuestionTag_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "QuestionTag_questionId_fkey" FOREIGN KEY ("questionId") REFERENCES "Question" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -55,3 +62,6 @@ CREATE TABLE "UserAnswer" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Tag_value_key" ON "Tag"("value");

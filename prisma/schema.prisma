@@ -19,19 +19,26 @@ model User {
 }
 
 model Question {
-  id       Int       @id @default(autoincrement())
-  question String
-  type     String
-  options  Answer[]
-  user     User      @relation(fields: [userId], references: [id])
-  userId   Int
-  history  History[]
-  tag      Tag[]
+  id          Int           @id @default(autoincrement())
+  question    String
+  type        String
+  options     Answer[]
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  history     History[]
+  QuestionTag QuestionTag[]
 }
 
 model Tag {
+  id          Int           @id @default(autoincrement())
+  value       String        @unique
+  QuestionTag QuestionTag[]
+}
+
+model QuestionTag {
   id         Int      @id @default(autoincrement())
-  value      String
+  tag        Tag      @relation(fields: [tagId], references: [id])
+  tagId      Int
   question   Question @relation(fields: [questionId], references: [id])
   questionId Int
 }

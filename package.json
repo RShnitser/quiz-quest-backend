@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "npx nodemon",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node --files prisma/seed.ts"
   },
   "author": "",
   "license": "ISC",
