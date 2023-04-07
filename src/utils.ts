@@ -2,7 +2,8 @@ import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { number, z, ZodSchema } from "zod";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import { ParamsDictionary } from "express-serve-static-core";
 import { prisma } from "./client";
 
 export const encryptPassword = (password: string) => {
@@ -36,13 +37,16 @@ export const getDataFromToken = (token?: string) => {
   }
 };
 
-export const validateBody = (data: ZodSchema) => {
+export const validateBody = <T>(
+  data: ZodSchema<T>
+): RequestHandler<ParamsDictionary, any, T, any> => {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = data.safeParse(req.body);
     if (!result.success) {
       return res.status(401).json(result.error);
     }
-    next();
+    req.body = result.data;
+    return next();
   };
 };
 
