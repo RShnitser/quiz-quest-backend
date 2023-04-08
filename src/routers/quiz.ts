@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../client";
-import { Prisma, Question, Answer, Tag } from "@prisma/client";
-import { validateBody } from "../utils";
+import { Question, Answer, Tag } from "@prisma/client";
+import { authMiddleWare, validateBody } from "../utils";
 import { z } from "zod";
 
 const quizRouter = Router();
@@ -19,6 +19,7 @@ const shuffleArray = <T>(array: Array<T>) => {
 
 quizRouter.post(
   "/",
+  authMiddleWare,
   validateBody(
     z
       .object({
