@@ -4,6 +4,8 @@ import { quizRouter } from "./routers/quiz";
 import { authRouter } from "./routers/auth";
 import { User } from "@prisma/client";
 import { userRouter } from "./routers/user";
+import { questionRouter } from "./routers/question";
+import { historyRouter } from "./routers/history";
 
 declare global {
   namespace Express {
@@ -34,5 +36,7 @@ app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/quiz", quizRouter);
+app.use("/question", questionRouter);
+app.use("/history", historyRouter);
 
 app.listen(3000);
