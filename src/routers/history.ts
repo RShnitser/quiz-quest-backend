@@ -21,8 +21,11 @@ historyRouter.get("/", authMiddleWare, async (req, res) => {
   });
 
   const result: {
+    id: number;
+    //userId: number;
     question: Question;
     answers: { userAnswer: UserAnswer; answer: Answer }[];
+    date: Date;
   }[] = [];
 
   for (const entry of history) {
@@ -66,8 +69,11 @@ historyRouter.get("/", authMiddleWare, async (req, res) => {
     }
 
     result.push({
+      id: entry.id,
+      //userId: req.user.id,
       question: question,
       answers: answerData,
+      date: entry.createdDate,
     });
   }
 
@@ -78,17 +84,19 @@ historyRouter.post(
   "/",
   authMiddleWare,
   validateBody(
-    z.object({
-      questionId: z.number(),
-      userAnswers: z
-        .object({
-          answerId: z.number(),
-          answer: z.string().optional(),
-          answerApplies: z.boolean().optional(),
-          order: z.number().int().positive().optional(),
-        })
-        .array(),
-    })
+    z
+      .object({
+        questionId: z.number(),
+        userAnswer: z.array(
+          z.object({
+            answerId: z.number(),
+            userAnswer: z.string().optional(),
+            userAnswerApplies: z.boolean().optional(),
+            order: z.number().int().optional(),
+          })
+        ),
+      })
+      .array()
   ),
   async (req, res) => {
     if (req.user === undefined) {
@@ -97,25 +105,27 @@ historyRouter.post(
 
     const body = req.body;
 
-    const newEntry = await prisma.history.create({
-      data: {
-        userId: req.user.id,
-        questionId: body.questionId,
-      },
-    });
-
-    for (const userAnswer of body.userAnswers) {
-      await prisma.userAnswer.create({
+    for (const entry of body) {
+      const newEntry = await prisma.history.create({
         data: {
-          historyId: newEntry.id,
-          answerId: userAnswer.answerId,
-          userAnswer: userAnswer.answer,
-          userAnswerApplies: userAnswer.answerApplies,
-          order: userAnswer.order,
+          userId: req.user.id,
+          questionId: entry.questionId,
         },
       });
+
+      for (const userAnswer of entry.userAnswer) {
+        await prisma.userAnswer.create({
+          data: {
+            historyId: newEntry.id,
+            answerId: userAnswer.answerId,
+            userAnswer: userAnswer.userAnswer,
+            userAnswerApplies: userAnswer.userAnswerApplies,
+            order: userAnswer.order,
+          },
+        });
+      }
     }
-    return res.status(200).send(newEntry);
+    return res.status(200).json({ message: "Success" });
   }
 );
 

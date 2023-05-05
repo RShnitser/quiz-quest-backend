@@ -410,17 +410,17 @@ const history: History[] = [
       {
         answerId: 24,
         answerApplies: false,
-        order: 2,
+        order: 1,
       },
       {
         answerId: 25,
         answerApplies: true,
-        order: 3,
+        order: 2,
       },
       {
         answerId: 26,
         answerApplies: false,
-        order: 4,
+        order: 3,
       },
     ],
     date: 1674876701987,

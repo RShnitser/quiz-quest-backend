@@ -21,17 +21,15 @@ quizRouter.post(
   "/",
   authMiddleWare,
   validateBody(
-    z
-      .object({
-        count: z.number(),
-        tags: z.string().array(),
-      })
-      .partial()
+    z.object({
+      count: z.number(),
+      tags: z.string().array(),
+    })
   ),
   async (req, res) => {
     const body = req.body;
     const count = body.count || 5;
-    const tags: string[] | undefined = body.tags;
+    const tags: string[] | undefined = body.tags.length ? body.tags : undefined;
 
     // const questions = await prisma.$queryRaw(
     //   Prisma.sql`SELECT * from Question INNER JOIN Tag ON Question.id = Tag.questionId WHERE Tag.value IN ("CSS") ORDER BY RANDOM() LIMIT ${number}`
