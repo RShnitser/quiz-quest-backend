@@ -17,7 +17,7 @@ userRouter.post(
   ),
   async (req, res) => {
     const body = req.body;
-
+    console.log("request sent");
     try {
       const user = await prisma.user.create({
         data: {
@@ -27,7 +27,6 @@ userRouter.post(
       });
 
       const token = createToken(user);
-
       return res.status(200).send({
         userInfo: {
           email: user.email,

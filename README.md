@@ -1,7 +1,8 @@
 quiz-quest-backend
 
-npm run dev - server
-npm run run seed - runs database seeder
+npm i //install dependencies
+npm run dev // runs server
+npm run run seed // runs database seeder
 
 users available after seedings:
 

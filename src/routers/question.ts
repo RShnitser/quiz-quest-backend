@@ -12,7 +12,6 @@ questionRouter.post(
     z.object({
       question: z.string(),
       type: z.string(),
-      //userId: z.number(),
       options: z
         .object({
           answer: z.string(),

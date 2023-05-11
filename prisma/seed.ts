@@ -5,6 +5,7 @@ const clearDB = async () => {
   await prisma.userAnswer.deleteMany();
   await prisma.history.deleteMany();
   await prisma.answer.deleteMany();
+  await prisma.questionTag.deleteMany();
   await prisma.tag.deleteMany();
   await prisma.question.deleteMany();
   await prisma.user.deleteMany();

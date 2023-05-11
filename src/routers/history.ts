@@ -22,7 +22,6 @@ historyRouter.get("/", authMiddleWare, async (req, res) => {
 
   const result: {
     id: number;
-    //userId: number;
     question: Question;
     answers: { userAnswer: UserAnswer; answer: Answer }[];
     date: Date;

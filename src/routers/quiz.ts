@@ -31,10 +31,6 @@ quizRouter.post(
     const count = body.count || 5;
     const tags: string[] | undefined = body.tags.length ? body.tags : undefined;
 
-    // const questions = await prisma.$queryRaw(
-    //   Prisma.sql`SELECT * from Question INNER JOIN Tag ON Question.id = Tag.questionId WHERE Tag.value IN ("CSS") ORDER BY RANDOM() LIMIT ${number}`
-    // );
-
     const tagIds = await prisma.tag.findMany({
       select: {
         id: true,
@@ -94,27 +90,6 @@ quizRouter.post(
       result.push(entry);
     }
 
-    // const result: { question: Question; answers: Answer[]; tags: Tag[] }[] = [];
-    // for (const question of questions) {
-    //   const questionData = {
-    //     question: question,
-    //     answers: await prisma.answer.findMany({
-    //       where: {
-    //         questionId: {
-    //           equals: question.id,
-    //         },
-    //       },
-    //     }),
-    //     tags: await prisma.tag.findMany({
-    //       where: {
-    //         questionId: {
-    //           equals: question.id,
-    //         },
-    //       },
-    //     }),
-    //   };
-    //   result.push(questionData);
-    // }
     res.status(200).send(result);
   }
 );
